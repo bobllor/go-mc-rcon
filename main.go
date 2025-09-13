@@ -2,30 +2,36 @@ package main
 
 import (
 	"fmt"
-	rcon "rcon/core"
-	"time"
+	"rcon/cmd"
+	"rcon/rcon"
 )
 
 func main() {
-	network := ""
-	address := ""
+	cmd.Execute()
+	fmt.Println(cmd.Host)
 
-	conn, err := rcon.Connect(network, address, time.Second*5)
-	if err != nil {
-		panic(err)
-	}
+	fmt.Println(rcon.YamlConfig)
+	/*
+		network := "tcp"
+		address := ""
+		rcon := rcon.NewRCON()
 
-	password := ""
+		conn, err := rcon.Connect(network, address, time.Second*5)
+		if err != nil {
+			panic(err)
+		}
 
-	err = conn.Authenticate(password)
-	if err != nil {
-		panic(err)
-	}
+		password := ""
 
-	cmdOutput, err := conn.Command("")
-	if err != nil {
-		panic(err)
-	}
+		err = conn.Authenticate(password)
+		if err != nil {
+			panic(err)
+		}
 
-	fmt.Println(cmdOutput)
+		cmdOutput, err := conn.Command("")
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(cmdOutput)*/
 }

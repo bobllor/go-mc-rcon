@@ -1,4 +1,4 @@
-package packet
+package rcon
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 type RCON struct {
 	net.Conn
 	Packet          RCONPacket
-	IsAuthenticated bool
+	isAuthenticated bool
 }
 
 type RCONPacket struct {
@@ -25,8 +25,21 @@ type RCONPacket struct {
 	Pad       []byte
 }
 
+func NewRCON() *RCON {
+	return &RCON{
+		Packet: RCONPacket{
+			Length:    0,
+			RequestID: 0,
+			Type:      0,
+			Payload:   []byte{},
+			Pad:       []byte{0, 0},
+		},
+		isAuthenticated: false,
+	}
+}
+
 // Connect intiiates a connection to the host.
-func Connect(networkType string, host string, timeout ...time.Duration) (*RCON, error) {
+func (r *RCON) Connect(networkType string, host string, timeout ...time.Duration) (*RCON, error) {
 	if len(timeout) > 1 || len(timeout) < 1 {
 		errMsg := "timeout can only take one argument"
 		return nil, errors.New(errMsg)
@@ -45,7 +58,7 @@ func Connect(networkType string, host string, timeout ...time.Duration) (*RCON, 
 //
 // It returns an error if the authentication process fails.
 func (r *RCON) Authenticate(password string) error {
-	if r.IsAuthenticated {
+	if r.isAuthenticated {
 		fmt.Println("Already authenticated")
 		return nil
 	}
@@ -71,7 +84,7 @@ func (r *RCON) Authenticate(password string) error {
 		return err
 	}
 
-	r.IsAuthenticated = true
+	r.isAuthenticated = true
 	return nil
 }
 
@@ -80,7 +93,7 @@ func (r *RCON) Authenticate(password string) error {
 // The server's response can be empty, and will return an empty string.
 // An error will be returned if any issues occur during the process.
 func (r *RCON) Command(command string) (string, error) {
-	if !r.IsAuthenticated {
+	if !r.isAuthenticated {
 		errMsg := "not authenticated, call RCON.Authenticate"
 		return "", errors.New(errMsg)
 	}
