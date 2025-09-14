@@ -105,13 +105,18 @@ func (c *Config) RemoveServerEntry(name string) error {
 // GetServer returns the server of the given name.
 //
 // If the name entry does not exist, then return an error.
-func (c *Config) GetServer(name string) (*server, error) {
+func (c *Config) GetServerEntry(name string) (*server, error) {
 	if s, ok := c.Servers[name]; ok {
 		return &s, nil
 	}
 
 	errMsg := fmt.Sprintf("no entries found with the name %s", name)
 	return nil, errors.New(errMsg)
+}
+
+// GetYamlPath returns the full path to the YAML file.
+func (c *Config) GetYamlPath() string {
+	return c.yamlFilePath
 }
 
 // updateYaml updates the YAML file when a modification happens.

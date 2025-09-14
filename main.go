@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// TODO: fix the name, it will use the name given by the flag instead (--name or -n).
-	serverInfo, err := config.GetServer("default")
+	serverInfo, err := config.GetServerEntry("default")
 	if err != nil {
 		panic(err)
 	}
