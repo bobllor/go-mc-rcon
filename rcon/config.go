@@ -27,13 +27,11 @@ const yamlName = "mc-rcon"
 //
 // config is returned if the YAML can be successfully read.
 // If the YAML file cannot be read, an error is returned and config will be nil.
-func NewConfig(yamlLocation string) (*Config, error) {
-	// will be concatenated with .yml or .yaml depending on the config extension.
-
+func NewConfig(yamlDir string) (*Config, error) {
 	// checkYamlPath validates this and changes it to a matching YAML extension.
-	var yamlPath string = fmt.Sprintf("%s/%s.yaml", yamlLocation, yamlName)
+	var yamlPath string = fmt.Sprintf("%s/%s.yaml", yamlDir, yamlName)
 	yamlConfig := Config{
-		yamlDirectory: yamlLocation,
+		yamlDirectory: yamlDir,
 		yamlFilePath:  yamlPath,
 	}
 
@@ -42,7 +40,7 @@ func NewConfig(yamlLocation string) (*Config, error) {
 		return nil, err
 	}
 
-	err = os.MkdirAll(yamlLocation, 0o644)
+	err = os.MkdirAll(yamlDir, 0o644)
 	if err != nil {
 		return nil, err
 	}
