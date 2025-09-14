@@ -9,7 +9,6 @@ import (
 
 var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("idk")
 	},
 }
 

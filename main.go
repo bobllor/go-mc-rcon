@@ -2,36 +2,45 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"rcon/cmd"
 	"rcon/rcon"
 )
 
+// TODO: remove all panic calls later
+
 func main() {
 	cmd.Execute()
-	fmt.Println(cmd.Host)
+	yamlDir := os.Getenv("HOME") + "/.config/.mcrcon"
 
-	fmt.Println(rcon.YamlConfig)
-	/*
-		network := "tcp"
-		address := ""
-		rcon := rcon.NewRCON()
+	config, err := rcon.NewConfig(yamlDir)
+	if err != nil {
+		panic(err)
+	}
 
-		conn, err := rcon.Connect(network, address, time.Second*5)
-		if err != nil {
-			panic(err)
-		}
+	// TODO: fix the name, it will use the name given by the flag instead (--name or -n).
+	serverInfo, err := config.GetServer("default")
+	if err != nil {
+		panic(err)
+	}
 
-		password := ""
+	rcon := rcon.NewRCON()
 
-		err = conn.Authenticate(password)
-		if err != nil {
-			panic(err)
-		}
+	conn, err := rcon.Connect(serverInfo.Host)
+	if err != nil {
+		panic(err)
+	}
 
-		cmdOutput, err := conn.Command("")
-		if err != nil {
-			panic(err)
-		}
+	err = conn.Authenticate(serverInfo.RCON_Password)
+	if err != nil {
+		panic(err)
+	}
 
-		fmt.Println(cmdOutput)*/
+	// TODO: fix commmand, will use the command given by the flag (-c).
+	cmdOutput, err := conn.Command("deop Notch")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(cmdOutput)
 }

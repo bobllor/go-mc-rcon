@@ -38,14 +38,19 @@ func NewRCON() *RCON {
 	}
 }
 
-// Connect intiiates a connection to the host.
-func (r *RCON) Connect(networkType string, host string, timeout ...time.Duration) (*RCON, error) {
-	if len(timeout) > 1 || len(timeout) < 1 {
+// Connect intiates a connection to the host.
+func (r *RCON) Connect(host string, timeout ...time.Duration) (*RCON, error) {
+	timeDuration := time.Second * 5
+
+	if len(timeout) > 1 {
 		errMsg := "timeout can only take one argument"
 		return nil, errors.New(errMsg)
+	} else if len(timeout) == 1 {
+		timeDuration = timeout[0]
 	}
+	networkType := "tcp"
 
-	conn, err := net.DialTimeout(networkType, host, timeout[0])
+	conn, err := net.DialTimeout(networkType, host, timeDuration)
 	if err != nil {
 		return nil, err
 	}

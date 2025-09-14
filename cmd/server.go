@@ -1,15 +1,10 @@
 package cmd
 
-import "rcon/rcon"
-
 var Host string
 
 // NOTE: maybe having a "server" subcommand?
 
 func init() {
-	serversMap := rcon.YamlConfig.Servers
-	network := serversMap[rcon.YamlConfig.Default_Server].Host
-
 	/*
 		TODO:
 		 	1. password flag, required if choosing --host (does not work alone)
@@ -20,5 +15,5 @@ func init() {
 		 	6.
 	*/
 
-	rootCmd.PersistentFlags().StringVar(&Host, "host", network, "Set the server's address")
+	rootCmd.PersistentFlags().StringVar(&Host, "host", "", "Set the server's address")
 }
