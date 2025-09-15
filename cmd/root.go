@@ -1,11 +1,15 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"rcon/rcon"
 
 	"github.com/spf13/cobra"
 )
+
+type ServerMeta struct {
+	ServerTag  string
+	ServerAuth rcon.Server
+}
 
 type rootData struct {
 	yamlDir string
@@ -19,9 +23,6 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		fmt.Println("hi")
-		os.Exit(1)
 	}
 }
 

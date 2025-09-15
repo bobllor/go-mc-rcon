@@ -11,11 +11,9 @@ import (
 // TODO: remove all panics
 
 type serverData struct {
-	serverName  string
-	hostAddress string
-	password    string
-	command     string
-	yamlDir     string
+	serverInfo ServerMeta
+	command    string
+	yamlDir    string
 }
 
 var serverFlags = &serverData{}
@@ -29,7 +27,7 @@ var serverCmd = &cobra.Command{
 			panic(err)
 		}
 
-		if serverFlags.serverName != "" {
+		if serverFlags.serverInfo.ServerTag != "" {
 			err = serverFlags.runServerNameCommand(config)
 			if err != nil {
 				panic(err)
@@ -37,7 +35,7 @@ var serverCmd = &cobra.Command{
 		}
 
 		// password check is not needed since it is required if host is used.
-		if serverFlags.hostAddress != "" {
+		if serverFlags.serverInfo.ServerAuth.Host != "" {
 			err = serverFlags.runServerHostCommand()
 			if err != nil {
 				panic(err)
@@ -50,18 +48,19 @@ var serverCmd = &cobra.Command{
 func InitializeServerCmd(yamlDirectory string) {
 	serverFlags.yamlDir = yamlDirectory
 
-	serverCmd.Flags().StringVar(
-		&serverFlags.serverName, "name", "", "user-defined name of a server, requires YAML entry")
-	serverCmd.Flags().StringVar(
-		&serverFlags.hostAddress, "host", "", "host address of the server, requires password")
 	serverCmd.Flags().StringVarP(
-		&serverFlags.password, "password", "p", "", "password of the server, pass - to prompt for secure input")
+		&serverFlags.serverInfo.ServerTag, "tag", "t",
+		"", "the tag of a server, requires a YAML entry")
+	serverCmd.Flags().StringVar(
+		&serverFlags.serverInfo.ServerAuth.Host, "host", "", "host address of the server, requires password")
+	serverCmd.Flags().StringVarP(
+		&serverFlags.serverInfo.ServerAuth.Password, "password", "p",
+		"", "password of the server, pass - to prompt for secure input")
 	serverCmd.Flags().StringVarP(
 		&serverFlags.command, "command", "c", "", "the command sent to the server through RCON")
 
-	serverCmd.MarkFlagRequired("command")
 	serverCmd.MarkFlagsRequiredTogether("host", "password")
-	serverCmd.MarkFlagsMutuallyExclusive("host", "name")
+	serverCmd.MarkFlagsMutuallyExclusive("host", "tag")
 
 	rootCmd.AddCommand(serverCmd)
 }
@@ -69,12 +68,12 @@ func InitializeServerCmd(yamlDirectory string) {
 // runServerNameCommand runs the command based off of the server name.
 // This requires the given server name to exist in the YAML entry.
 func (s *serverData) runServerNameCommand(yamlConfig *rcon.Config) error {
-	if _, ok := yamlConfig.Servers[s.serverName]; !ok {
-		errMsg := fmt.Sprintf("no entries found for %s", s.serverName)
+	if _, ok := yamlConfig.Servers[s.serverInfo.ServerTag]; !ok {
+		errMsg := fmt.Sprintf("no entries found for %s", s.serverInfo.ServerTag)
 		return errors.New(errMsg)
 	}
 
-	serverInfo := yamlConfig.Servers[s.serverName]
+	serverInfo := yamlConfig.Servers[s.serverInfo.ServerTag]
 
 	serverHost := serverInfo.Host
 	serverPassword := serverInfo.Password
@@ -104,12 +103,12 @@ func (s *serverData) runServerNameCommand(yamlConfig *rcon.Config) error {
 func (s *serverData) runServerHostCommand() error {
 	rcon := rcon.NewRCON()
 
-	conn, err := rcon.Connect(s.hostAddress)
+	conn, err := rcon.Connect(s.serverInfo.ServerAuth.Host)
 	if err != nil {
 		return err
 	}
 
-	err = conn.Authenticate(s.password)
+	err = conn.Authenticate(s.serverInfo.ServerAuth.Password)
 	if err != nil {
 		return err
 	}
