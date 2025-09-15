@@ -5,13 +5,14 @@ import (
 	"rcon/cmd"
 )
 
-// TODO: remove all panic calls later
+// TODO: support for windows
 
 func main() {
 	yamlDir := os.Getenv("HOME") + "/.config/.mcrcon"
 
 	cmd.InitializeServerCmd(yamlDir)
 	cmd.InitializeRootCmd(yamlDir)
+	cmd.InitializeAddCmd()
 
 	cmd.Execute()
 }
