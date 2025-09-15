@@ -52,7 +52,11 @@ func NewConfig(yamlDir string) (*Config, error) {
 		return nil, err
 	}
 
-	yaml.Unmarshal(yamlContent, &yamlConfig)
+	err = yaml.Unmarshal(yamlContent, &yamlConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &yamlConfig, nil
 }
 
