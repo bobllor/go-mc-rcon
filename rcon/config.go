@@ -8,16 +8,18 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// TODO: add logging to Config, i have not set it up yet!
+
 type Config struct {
-	Servers        map[string]server
-	Default_Server string
-	yamlDirectory  string
-	yamlFilePath   string
+	Servers       map[string]Server `yaml:"servers"`
+	DefaultServer string            `yaml:"default_server"`
+	yamlDirectory string
+	yamlFilePath  string
 }
 
-type server struct {
-	Host          string
-	RCON_Password string
+type Server struct {
+	Host     string `yaml:"host"`
+	Password string `yaml:"rcon_password"`
 }
 
 const yamlName = "mc-rcon"
@@ -60,9 +62,9 @@ func NewConfig(yamlDir string) (*Config, error) {
 //
 // An error is returned if there are issues interacting with the YAML file.
 func (c *Config) AddServerEntry(name string, host string, password string) error {
-	newEntry := server{
-		Host:          host,
-		RCON_Password: password,
+	newEntry := Server{
+		Host:     host,
+		Password: password,
 	}
 
 	c.Servers[name] = newEntry
@@ -103,7 +105,7 @@ func (c *Config) RemoveServerEntry(name string) error {
 // GetServer returns the server of the given name.
 //
 // If the name entry does not exist, then return an error.
-func (c *Config) GetServerEntry(name string) (*server, error) {
+func (c *Config) GetServerEntry(name string) (*Server, error) {
 	if s, ok := c.Servers[name]; ok {
 		return &s, nil
 	}
