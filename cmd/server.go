@@ -57,7 +57,7 @@ func InitializeServerCmd(yamlDirectory string) {
 		&serverFlags.serverInfo.ServerAuth.Host, "host", "", "Host address of the server")
 	serverCmd.Flags().StringVarP(
 		&serverFlags.serverInfo.ServerAuth.Password, "password", "p",
-		"", "The password to the server, pass - to prompt for secure input")
+		"", `The password for RCON access, pass "-" to prompt for secure input`)
 	serverCmd.Flags().StringVarP(
 		&serverFlags.command, "command", "c", "", "The command to be executed on the server")
 
