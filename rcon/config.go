@@ -42,7 +42,7 @@ func NewConfig(yamlDir string) (*Config, error) {
 		return nil, err
 	}
 
-	err = os.MkdirAll(yamlDir, 0o644)
+	err = os.MkdirAll(yamlDir, 0o755)
 	if err != nil {
 		return nil, err
 	}
@@ -57,17 +57,17 @@ func NewConfig(yamlDir string) (*Config, error) {
 }
 
 // AddServerEntry adds a server entry to the YAML file with a given name.
-// A name is required to distinguish the entry from other entries. If an
-// entry exists with the same name, then it will get replaced by the new entry.
+// A tag is required to distinguish the entry from other entries. If an
+// entry exists with the given tag, then the previous tag will be replaced by the new tag.
 //
 // An error is returned if there are issues interacting with the YAML file.
-func (c *Config) AddServerEntry(name string, host string, password string) error {
+func (c *Config) AddServerEntry(serverTag string, host string, password string) error {
 	newEntry := Server{
 		Host:     host,
 		Password: password,
 	}
 
-	c.Servers[name] = newEntry
+	c.Servers[serverTag] = newEntry
 
 	err := c.checkYamlPath()
 	if err != nil {
@@ -82,16 +82,16 @@ func (c *Config) AddServerEntry(name string, host string, password string) error
 	return nil
 }
 
-// RemoveServerEntry takes a server name and removes it from the YAML file.
+// RemoveServerEntry takes a server tag and removes it from the YAML file.
 //
 // If no entries exist then nothing occurs.
 // If the file fails to update then an error is returned.
-func (c *Config) RemoveServerEntry(name string) error {
-	if _, ok := c.Servers[name]; !ok {
-		fmt.Printf("no entries found with name %s\n", name)
+func (c *Config) RemoveServerEntry(serverTag string) error {
+	if _, ok := c.Servers[serverTag]; !ok {
+		fmt.Printf("no entries found with tag %s\n", serverTag)
 		return nil
 	} else {
-		delete(c.Servers, name)
+		delete(c.Servers, serverTag)
 	}
 
 	err := c.updateYaml()
@@ -102,15 +102,15 @@ func (c *Config) RemoveServerEntry(name string) error {
 	return nil
 }
 
-// GetServer returns the server of the given name.
+// GetServer returns the server of the matching server tag in the entries.
 //
 // If the name entry does not exist, then return an error.
-func (c *Config) GetServerEntry(name string) (*Server, error) {
-	if s, ok := c.Servers[name]; ok {
+func (c *Config) GetServerEntry(serverTag string) (*Server, error) {
+	if s, ok := c.Servers[serverTag]; ok {
 		return &s, nil
 	}
 
-	errMsg := fmt.Sprintf("no entries found with the name %s", name)
+	errMsg := fmt.Sprintf("no entries found with tag %s", serverTag)
 	return nil, errors.New(errMsg)
 }
 
