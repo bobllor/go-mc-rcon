@@ -20,7 +20,9 @@ var serverFlags = &serverData{}
 
 var serverCmd = &cobra.Command{
 	Use:   "server [--name string|--host string --password|-p [string]] [-c string]",
-	Short: "connect to a server and run a command",
+	Short: "Execute a command on a server",
+	Long: `Select a server with a tag or by passing in the host address and password 
+to execute a command on the server`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := rcon.NewConfig(serverFlags.yamlDir)
 		if err != nil {
@@ -50,15 +52,16 @@ func InitializeServerCmd(yamlDirectory string) {
 
 	serverCmd.Flags().StringVarP(
 		&serverFlags.serverInfo.ServerTag, "tag", "t",
-		"", "the tag of a server, requires a YAML entry")
+		"", "The tag of a server, requires an existing YAML entry")
 	serverCmd.Flags().StringVar(
-		&serverFlags.serverInfo.ServerAuth.Host, "host", "", "host address of the server, requires password")
+		&serverFlags.serverInfo.ServerAuth.Host, "host", "", "Host address of the server")
 	serverCmd.Flags().StringVarP(
 		&serverFlags.serverInfo.ServerAuth.Password, "password", "p",
-		"", "password of the server, pass - to prompt for secure input")
+		"", "The password to the server, pass - to prompt for secure input")
 	serverCmd.Flags().StringVarP(
-		&serverFlags.command, "command", "c", "", "the command sent to the server through RCON")
+		&serverFlags.command, "command", "c", "", "The command to be executed on the server")
 
+	serverCmd.MarkFlagsOneRequired("host", "tag")
 	serverCmd.MarkFlagsRequiredTogether("host", "password")
 	serverCmd.MarkFlagsMutuallyExclusive("host", "tag")
 
