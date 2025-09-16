@@ -3,12 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"rcon/rcon"
 
 	"github.com/spf13/cobra"
 )
-
-// TODO: remove all panics
 
 type serverData struct {
 	serverInfo ServerMeta
@@ -26,21 +25,34 @@ to execute a command on the server`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := rcon.NewConfig(serverFlags.yamlDir)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		if serverFlags.serverInfo.ServerTag != "" {
 			err = serverFlags.runServerNameCommand(config)
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
+				os.Exit(1)
 			}
 		}
 
 		// password check is not needed since it is required if host is used.
 		if serverFlags.serverInfo.ServerAuth.Host != "" {
+			if serverFlags.serverInfo.ServerAuth.Password == "-" {
+				password, err := readPassword()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				serverFlags.serverInfo.ServerAuth.Password = password
+			}
+
 			err = serverFlags.runServerHostCommand()
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
+				os.Exit(1)
 			}
 		}
 	},

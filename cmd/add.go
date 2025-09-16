@@ -10,7 +10,6 @@ var addCmd = &cobra.Command{
 	Use:   "add [--tag|-t string] [--host string] [--password|-p string]",
 	Short: "Add a server entry to the config",
 	Run: func(cmd *cobra.Command, args []string) {
-
 	},
 }
 
