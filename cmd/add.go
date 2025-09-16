@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"rcon/rcon"
+
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +15,9 @@ var addCmd = &cobra.Command{
 	},
 }
 
-func InitializeAddCmd() {
+func InitializeAddCmd(yamlConfig *rcon.Config) {
+	addFlags.Config = yamlConfig
+
 	addCmd.Flags().StringVarP(
 		&addFlags.ServerTag, "tag", "t", "", "The identification of the server")
 	addCmd.Flags().StringVar(&addFlags.ServerAuth.Host, "host", "", "The host address of the server")

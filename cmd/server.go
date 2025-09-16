@@ -12,7 +12,6 @@ import (
 type serverData struct {
 	serverInfo ServerMeta
 	command    string
-	yamlDir    string
 }
 
 var serverFlags = &serverData{}
@@ -23,14 +22,8 @@ var serverCmd = &cobra.Command{
 	Long: `Select a server with a tag or by passing in the host address and password 
 to execute a command on the server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := rcon.NewConfig(serverFlags.yamlDir)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
 		if serverFlags.serverInfo.ServerTag != "" {
-			err = serverFlags.runServerNameCommand(config)
+			err := serverFlags.runServerNameCommand(serverFlags.serverInfo.Config)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -49,7 +42,7 @@ to execute a command on the server`,
 				serverFlags.serverInfo.ServerAuth.Password = password
 			}
 
-			err = serverFlags.runServerHostCommand()
+			err := serverFlags.runServerHostCommand()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -59,8 +52,8 @@ to execute a command on the server`,
 }
 
 // InitializeServer initializes the serverData struct with the arguments given.
-func InitializeServerCmd(yamlDirectory string) {
-	serverFlags.yamlDir = yamlDirectory
+func InitializeServerCmd(yamlConfig *rcon.Config) {
+	serverFlags.serverInfo.Config = yamlConfig
 
 	serverCmd.Flags().StringVarP(
 		&serverFlags.serverInfo.ServerTag, "tag", "t",

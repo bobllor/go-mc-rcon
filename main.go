@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"rcon/cmd"
+	"rcon/rcon"
 )
 
 // TODO: support for windows
@@ -10,9 +12,15 @@ import (
 func main() {
 	yamlDir := os.Getenv("HOME") + "/.config/.mcrcon"
 
-	cmd.InitializeServerCmd(yamlDir)
-	cmd.InitializeRootCmd(yamlDir)
-	cmd.InitializeAddCmd()
+	config, err := rcon.NewConfig(yamlDir)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	cmd.InitializeServerCmd(config)
+	cmd.InitializeRootCmd(config)
+	cmd.InitializeAddCmd(config)
 
 	cmd.Execute()
 }

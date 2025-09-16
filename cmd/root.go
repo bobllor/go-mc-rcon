@@ -14,10 +14,11 @@ import (
 type ServerMeta struct {
 	ServerTag  string
 	ServerAuth rcon.Server
+	Config     *rcon.Config
 }
 
 type rootData struct {
-	yamlDir string
+	ServerInfo ServerMeta
 }
 
 var rootFlags = &rootData{}
@@ -35,8 +36,8 @@ func Execute() {
 }
 
 // InitializeServer initializes the rootData struct with the arguments given.
-func InitializeRootCmd(yamlDirectory string) {
-	rootFlags.yamlDir = yamlDirectory
+func InitializeRootCmd(yamlConfig *rcon.Config) {
+	rootFlags.ServerInfo.Config = yamlConfig
 }
 
 func readPassword() (string, error) {
