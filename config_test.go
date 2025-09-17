@@ -17,14 +17,28 @@ default_server: "default"
 `
 
 func TestCreateConfig(t *testing.T) {
-	_, err := getConfig(t)
+	_, err := getConfig(t, testYaml)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
+func TestEmptyConfig(t *testing.T) {
+	config, err := getConfig(t, "")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(config.Servers) != 0 {
+		t.Errorf("servers is not empty")
+	}
+	if config.DefaultServer != "" {
+		t.Errorf("default server is not empty")
+	}
+}
+
 func TestAddEntry(t *testing.T) {
-	config, err := getConfig(t)
+	config, err := getConfig(t, testYaml)
 	if err != nil {
 		t.Error(err)
 	}
@@ -66,7 +80,7 @@ func TestAddEntry(t *testing.T) {
 }
 
 func TestRemoveEntry(t *testing.T) {
-	config, err := getConfig(t)
+	config, err := getConfig(t, testYaml)
 	if err != nil {
 		t.Error(err)
 	}
@@ -83,11 +97,11 @@ func TestRemoveEntry(t *testing.T) {
 	}
 }
 
-func getConfig(t *testing.T) (*rcon.Config, error) {
+func getConfig(t *testing.T, dataToWrite string) (*rcon.Config, error) {
 	tempPath := t.TempDir()
 	tempYamlPath := tempPath + "/mc-rcon.yml"
 
-	err := os.WriteFile(tempYamlPath, []byte(testYaml), 0o644)
+	err := os.WriteFile(tempYamlPath, []byte(dataToWrite), 0o644)
 	if err != nil {
 		return nil, err
 	}

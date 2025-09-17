@@ -37,9 +37,9 @@ func NewConfig(yamlDir string) (*Config, error) {
 		yamlFilePath:  yamlPath,
 	}
 
-	err := yamlConfig.checkYamlPath()
+	err := yamlConfig.checkMakeYaml()
 	if err != nil {
-		return nil, err
+		os.WriteFile(yamlPath, []byte{}, 0o644)
 	}
 
 	err = os.MkdirAll(yamlDir, 0o755)
@@ -73,7 +73,7 @@ func (c *Config) AddServerEntry(serverTag string, host string, password string) 
 
 	c.Servers[serverTag] = newEntry
 
-	err := c.checkYamlPath()
+	err := c.checkMakeYaml()
 	if err != nil {
 		return err
 	}
@@ -138,13 +138,13 @@ func (c *Config) updateYaml() error {
 	return nil
 }
 
-// checkYamlPath checks if the YAML path is valid.
-// It checks for the extension of the YAML file.
-// It will update c.yamlFilePath to the matching file name, if found.
+// checkMakeYaml checks if the YAML exists, if not then it creates an empty YAML file.
+// c.yamlFilePath will be updated to the matching YAML file if the extension
+// does not end in .yaml.
 //
-// It returns nil if the file exists.
-// An error is return if the file does not exist.
-func (c *Config) checkYamlPath() error {
+// It returns nil if the file exists or if the file is successfully created.
+// If the file fails to write then it will return an error.
+func (c *Config) checkMakeYaml() error {
 	yamlExtensions := []string{"yaml", "yml", "YAML", "YML"}
 
 	for _, ext := range yamlExtensions {
@@ -159,6 +159,10 @@ func (c *Config) checkYamlPath() error {
 		}
 	}
 
-	errMsg := fmt.Sprintf("no YAML config found in %s", c.yamlDirectory)
-	return errors.New(errMsg)
+	err := os.WriteFile(c.yamlFilePath, []byte{}, 0o644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
