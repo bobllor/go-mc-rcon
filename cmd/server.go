@@ -22,6 +22,11 @@ var serverCmd = &cobra.Command{
 	Long: `Select a server with a tag or by passing in the host address and password 
 to execute a command on the server`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if serverFlags.command == "" {
+			fmt.Println("Cannot pass an empty command")
+			os.Exit(1)
+		}
+
 		if serverFlags.serverInfo.ServerTag != "" {
 			err := serverFlags.runServerNameCommand(serverFlags.serverInfo.Config)
 			if err != nil {
@@ -30,7 +35,6 @@ to execute a command on the server`,
 			}
 		}
 
-		// password check is not needed since it is required if host is used.
 		if serverFlags.serverInfo.ServerAuth.Host != "" {
 			if serverFlags.serverInfo.ServerAuth.Password == "-" {
 				password, err := readPassword()
