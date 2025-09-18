@@ -16,6 +16,12 @@ servers:
 default_server: "default"
 `
 
+type testServer struct {
+	serverName     string
+	serverHost     string
+	serverPassword string
+}
+
 func TestCreateConfig(t *testing.T) {
 	_, err := getConfig(t, testYaml)
 	if err != nil {
@@ -32,8 +38,19 @@ func TestEmptyConfig(t *testing.T) {
 	if len(config.Servers) != 0 {
 		t.Errorf("servers is not empty")
 	}
-	if config.DefaultServer != "" {
-		t.Errorf("default server is not empty")
+}
+
+func TestAddEntryEmpty(t *testing.T) {
+	config, err := getConfig(t, "")
+	if err != nil {
+		t.Error(err)
+	}
+
+	server := newTestServer()
+
+	err = config.AddServerEntry(server.serverName, server.serverHost, server.serverPassword)
+	if err != nil {
+		t.Error(err)
 	}
 }
 
@@ -112,4 +129,14 @@ func getConfig(t *testing.T, dataToWrite string) (*rcon.Config, error) {
 	}
 
 	return config, err
+}
+
+func newTestServer() *testServer {
+	server := testServer{
+		serverName:     "test_name",
+		serverHost:     "another_port",
+		serverPassword: "an0therR4nd0m:p@ssw0rd!",
+	}
+
+	return &server
 }

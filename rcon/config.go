@@ -33,14 +33,22 @@ func NewConfig(yamlDir string) (*Config, error) {
 	// checkYamlPath validates this and changes it to a matching YAML extension.
 	var yamlPath string = fmt.Sprintf("%s/%s.yaml", yamlDir, yamlName)
 	yamlConfig := Config{
+		DefaultServer: "",
 		yamlDirectory: yamlDir,
 		yamlFilePath:  yamlPath,
 	}
 
 	err := yamlConfig.checkMakeYaml()
 	if err != nil {
-		os.WriteFile(yamlPath, []byte{}, 0o644)
+		err := yamlConfig.createNewYaml()
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	//  when unmarshaling an empty config, it overwrites the paths- these holds the paths beforehand.
+	yamlDirState := yamlConfig.yamlDirectory
+	yamlFileState := yamlConfig.yamlFilePath
 
 	err = os.MkdirAll(yamlDir, 0o755)
 	if err != nil {
@@ -57,6 +65,13 @@ func NewConfig(yamlDir string) (*Config, error) {
 		return nil, err
 	}
 
+	if yamlConfig.yamlDirectory == "" {
+		yamlConfig.yamlDirectory = yamlDirState
+	}
+	if yamlConfig.yamlFilePath == "" {
+		yamlConfig.yamlFilePath = yamlFileState
+	}
+
 	return &yamlConfig, nil
 }
 
@@ -71,11 +86,18 @@ func (c *Config) AddServerEntry(serverTag string, host string, password string) 
 		Password: password,
 	}
 
+	if c.Servers == nil {
+		c.Servers = make(map[string]Server)
+	}
+
 	c.Servers[serverTag] = newEntry
 
 	err := c.checkMakeYaml()
 	if err != nil {
-		return err
+		err := c.createNewYaml()
+		if err != nil {
+			return err
+		}
 	}
 
 	err = c.updateYaml()
@@ -159,6 +181,11 @@ func (c *Config) checkMakeYaml() error {
 		}
 	}
 
+	return fmt.Errorf("no such file, path: %s", c.yamlFilePath)
+}
+
+// createNewYaml creates a new empty YAML file.
+func (c *Config) createNewYaml() error {
 	err := os.WriteFile(c.yamlFilePath, []byte{}, 0o644)
 	if err != nil {
 		return err
