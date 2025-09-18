@@ -145,6 +145,16 @@ func (c *Config) GetYamlPath() string {
 	return c.yamlFilePath
 }
 
+// GetServerEntires returns the server tag names in an array.
+func (c *Config) GetServerEntries() []string {
+	serverEntries := make([]string, 0, len(c.Servers))
+	for serverTag := range c.Servers {
+		serverEntries = append(serverEntries, serverTag)
+	}
+
+	return serverEntries
+}
+
 // updateYaml updates the YAML file when a modification happens.
 func (c *Config) updateYaml() error {
 	yamlContent, err := yaml.Marshal(c)
