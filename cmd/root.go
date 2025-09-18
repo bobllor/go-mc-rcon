@@ -26,6 +26,7 @@ var rootFlags = &rootData{}
 var rootCmd = &cobra.Command{
 	Use: "command",
 	Run: func(cmd *cobra.Command, args []string) {
+		// TODO: add another command here, but instead run off of the value from default server in the config
 		fmt.Println("test")
 	},
 }
@@ -40,6 +41,7 @@ func InitializeRootCmd(yamlConfig *rcon.Config) {
 	rootFlags.ServerInfo.Config = yamlConfig
 }
 
+// readPassword reads the password from STDIN securely.
 func readPassword() (string, error) {
 	stdin := int(syscall.Stdin)
 
