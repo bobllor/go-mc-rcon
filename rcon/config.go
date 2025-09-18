@@ -75,7 +75,7 @@ func NewConfig(yamlDir string) (*Config, error) {
 	return &yamlConfig, nil
 }
 
-// AddServerEntry adds a server entry to the YAML file with a given name.
+// AddServerEntry adds a server entry to the YAML file with a tag.
 // A tag is required to distinguish the entry from other entries. If an
 // entry exists with the given tag, then the previous tag will be replaced by the new tag.
 //
@@ -130,7 +130,7 @@ func (c *Config) RemoveServerEntry(serverTag string) error {
 
 // GetServer returns the server of the matching server tag in the entries.
 //
-// If the name entry does not exist, then return an error.
+// If the tag entry does not exist, then return an error.
 func (c *Config) GetServerEntry(serverTag string) (*Server, error) {
 	if s, ok := c.Servers[serverTag]; ok {
 		return &s, nil
